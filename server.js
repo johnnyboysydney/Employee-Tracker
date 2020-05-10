@@ -48,7 +48,7 @@ function renderImage(){
 //render table data and menu prompt
 function renderScreen(tableTitle, tableData){
     clear();
-    renderHeader();
+    renderImage();
     //log table title to console in inverse colors
     console.log(chalk.inverse.bold(tableTitle));
     //log table to console
@@ -129,4 +129,48 @@ function promptManagers(managers){
         .then(answer => {
             queryEmployeesByManager(answer.promptChoice);            
         });
+}
+
+//query all employees
+function queryEmployeesAll(){
+    //sql query
+    const query = `
+    SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name AS department_name, concat(manager.first_name, " ", manager.last_name) AS manager_full_name
+    FROM employee 
+    LEFT JOIN role ON employee.role_id = role.id
+    LEFT JOIN department ON department.id = role.department_id
+	LEFT JOIN employee as manager ON employee.manager_id = manager.id;`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        //build table data array from query result
+        const tableData = [];
+        for (let i = 0; i < res.length; i++) {
+            tableData.push({ 
+                "ID": res[i].id, 
+                "First Name": res[i].first_name,
+                "Last Name": res[i].last_name,
+                "Role": res[i].title,
+                "Salary": res[i].salary, 
+                "Department": res[i].department_name,
+                "Manager": res[i].manager_full_name
+            });
+        }
+        //render screen
+        renderScreen("All Employees", tableData);
+    });
+}
+
+//query all departments
+function queryDepartment(){
+    const query = `SELECT department.name FROM department;`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        //extract department names to array
+        const departments = [];
+        for (let i = 0; i < res.length; i++) {
+            departments.push(res[i].name);
+        }
+        //prompt for department selection
+        promptDepartments(departments)
+    });
 }
