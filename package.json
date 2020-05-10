@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/johnnyboysydney/Employee-Tracker#readme",
   "dependencies": {
+    "chalk": "^4.0.0",
+    "console-clear": "^1.1.1",
     "console.table": "^0.10.0",
+    "figlet": "^1.4.0",
     "inquirer": "^7.1.0",
     "mysql": "^2.18.1"
   }
