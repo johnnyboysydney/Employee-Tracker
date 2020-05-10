@@ -17,7 +17,7 @@ VALUES
 (5, "Sales Lead", 80000, 3),
 (6, "Creative Director", 80000, 4),
 (7, "Social Media Manager", 60000, 4),
-(8, "Chief quality Tester", 110000, 1),
+(8, "Chief Quality Tester", 110000, 1),
 (9, "Tester", 65000, 2);
 
 INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
