@@ -45,12 +45,88 @@ function renderImage(){
    console.log(chalk.dim("  Database\n"));
 }
 
-// figlet('Welcome to the Employee Tracker', function(err, data){
-//     if (err) {
-//         console.log('Something went wrong...');
-//         console.dir(err);
-//         return;
-//     }
-//     console.log(data)
-// });
+//render table data and menu prompt
+function renderScreen(tableTitle, tableData){
+    clear();
+    renderHeader();
+    //log table title to console in inverse colors
+    console.log(chalk.inverse.bold(tableTitle));
+    //log table to console
+    console.table(tableData);
+    //menu prompt
+    menuPrompt();
+}
 
+//initial prompt - which type of query?
+function menuPrompt(){
+    inquirer
+        .prompt({
+            type: "list",
+            name: "promptChoice",
+            message: "Make a selection:",
+            choices: ["View All Employees", "View All Employees by Department", "View All Employees by Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager", chalk.red("Exit Program")]
+          })
+        .then(answer => {
+            switch(answer.promptChoice){
+                case "View All Employees":
+                queryEmployeesAll();
+                break;
+
+                case "View All Employees by Department":
+                queryDepartments();
+                break;
+
+                case "View All Employees by Manager":
+                queryManagers();
+                break;
+
+                case "Add Employee":
+                addEmployee();
+                break;
+
+                case "Remove Employee":
+                removeEmployee();
+                break;
+
+                case "Update Employee Role":
+                updateEmployeeRole();
+                break;
+
+                case "Update Employee Manager":
+                updateEmployeeManager();
+                break;
+
+                case "\u001b[31mExit Program\u001b[39m":
+                clear();
+                process.exit();                
+            }             
+        });
+}
+
+//department prompt
+function promptDepartments(departments){
+    inquirer
+        .prompt({
+            type: "list",
+            name: "promptChoice",
+            message: "Select Department:",
+            choices: departments
+          })
+        .then(answer => {
+            queryEmployeesByDepartment(answer.promptChoice);            
+        });
+}
+
+//manager prompt
+function promptManagers(managers){
+    inquirer
+        .prompt({
+            type: "list",
+            name: "promptChoice",
+            message: "Select Manager:",
+            choices: managers
+          })
+        .then(answer => {
+            queryEmployeesByManager(answer.promptChoice);            
+        });
+}
