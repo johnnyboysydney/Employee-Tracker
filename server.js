@@ -4,7 +4,6 @@ const inquirer = require("inquirer");
 const mysql = require('mysql');
 const cTable = require('console.table');
 const clear = require('console-clear');
-const figlet = require('figlet');
 
 // MySQL DB Connection Information (remember to change this with your specific credentials)
 const connection = mysql.createConnection({
@@ -64,7 +63,7 @@ function menuPrompt(){
             type: "list",
             name: "promptChoice",
             message: "Make a selection:",
-            choices: ["View All Employees", "View All Employees by Department", "View All Employees by Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager", chalk.red("Exit Program")]
+            choices: ["View All Employees", "View All Employees by Department", "View All Employees by Manager", "Add Employee", "Add Roles", "Add Departments", "Remove Employee", "Update Employee Role", "Update Employee Manager", chalk.red("Exit Program")]
           })
         .then(answer => {
             switch(answer.promptChoice){
@@ -82,6 +81,14 @@ function menuPrompt(){
 
                 case "Add Employee":
                 addEmployee();
+                break;
+
+                case "Add Roles":
+                addRole();
+                break;
+
+                case "Add Departments":
+                addDepartment();
                 break;
 
                 case "Remove Employee":
@@ -266,10 +273,22 @@ function addEmployee(){
     inquirer
         .prompt([{
             name: "firstName",
-            message: "Enter first name: "
+            message: "Enter first name: ",
+            validate: async(input) => {
+                if(!input.match(/^[A-Z][A-Z ]{0,}/i)) {
+                    return "Sorry, the employee's first name must contain at least 1 character and must only contain letters and spaces!".yellow; 
+                }
+                    return true;
+            }
             }, {
             name: "lastName",
-            message: "Enter last name: "
+            message: "Enter last name: ",
+            validate: async(input) => {
+                if(!input.match(/^[A-Z][A-Z ]{0,}/i)) {
+                    return "Sorry, the employee's last name must contain at least 1 character and must only contain letters and spaces!".yellow; 
+                }
+                    return true;
+            }
             }])
         .then(answers => {
             //set newEmployee name
@@ -364,6 +383,89 @@ function addEmployee(){
             });            
         });
 }
+
+function addDepartment() {
+    inquirer
+      .prompt([
+        {
+          name: "dName",
+          type: "input",
+          message: "Enter new Department title:",
+          validate: async function confirmStringInput(input) {
+            if (input.trim() != "" && input.trim().length <= 30) {
+              return true;
+            }
+            return "Invalid input. Please limit your input to 30 characters or less.";
+          },
+        },
+      ])
+      .then((answer) => {
+        const query = `INSERT INTO department (name) VALUES (?);`;
+        connection.query(query, [answer.dName], (err, res) => {
+            if (err) throw err;
+            console.log("New Department added successfully!")
+        });
+      });
+}
+
+function addRole() {
+     //initialize 
+    const departments = [];
+    const departmentsName = [];
+     //sql query
+    const query = `SELECT id, name FROM department`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        for (let i=0;i<res.length;i++) {
+            departments.push({
+               id:res[i].id,
+               name:res[i].name});
+            departmentsName.push(res[i].name);   
+        }
+    inquirer
+        .prompt([
+            {
+            name: "rName",
+            type: "input",
+            message: "Enter new role title:",
+            validate: async function confirmStringInput(input) {
+                if (input.trim() != "" && input.trim().length <= 30) {
+                return true;
+                }
+                return "Invalid input. Please limit your input to 30 characters or less.";
+            },
+            },
+            {
+            name: "salNum",
+            type: "input",
+            message: "Enter role salary:",
+            validate: (input) => {
+                if(!input.match(/^[0-9]+$/)) {
+                    return "Please enter a number".yellow;
+                }
+                return true;
+                }  
+            },
+            {
+            type: "list",
+            name: "roleDept",
+            message: "Select department:",
+            choices: departmentsName
+            },
+        ])
+        .then((answer) => {
+        
+            let deptID = departments.find((obj) => obj.name === answer.roleDept).id;
+            connection.query("INSERT INTO role (title, salary, department_id) VALUES (?)", [
+            [answer.rName, answer.salNum, deptID],
+            ]);
+            console.log(
+            `${answer.rName} was added to the ${answer.roleDept} department.`
+            );
+            startApp();
+        });
+    });
+} 
 
 function removeEmployee(){
     const query = `

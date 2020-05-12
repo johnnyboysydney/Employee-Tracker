@@ -57,6 +57,8 @@ DELETE FROM department WHERE name like 'Q&A';
 DELETE FROM role WHERE role_id like 8;
 
 -- View the total utilized budget of a department
-
+select name, sum(r.salary) from  employeesdb.department d
+inner join employeesdb.role r on d.id = r.department_id
+where d.id like 1;
 
 
