@@ -63,7 +63,7 @@ function menuPrompt(){
             type: "list",
             name: "promptChoice",
             message: "Make a selection:",
-            choices: ["View All Employees", "View All Employees by Department", "View All Employees by Manager", "Add Employee", "Add Roles", "Add Departments", "Remove Employee", "Update Employee Role", "Update Employee Manager", chalk.red("Exit Program")]
+            choices: ["View All Employees", "View All Employees by Department", "View All Employees by Manager", "View Roles", "View Departments", "Add Employee", "Add Roles", "Add Departments", "Remove Employee", "Remove Role", "Remove Department", "Update Employee Role", "Update Employee Manager", "View Total Utilized Budget By Department", chalk.red("Exit Program")]
           })
         .then(answer => {
             switch(answer.promptChoice){
@@ -77,6 +77,14 @@ function menuPrompt(){
 
                 case "View All Employees by Manager":
                 queryManagers();
+                break;
+
+                case "View Roles":
+                queryRolesOnly();
+                break;
+
+                case "View Departments":
+                queryDepartmentsOnly();
                 break;
 
                 case "Add Employee":
@@ -95,12 +103,24 @@ function menuPrompt(){
                 removeEmployee();
                 break;
 
+                case "Remove Role":
+                removeRole();
+                break;
+
+                case "Remove Deparment":
+                removeDepartment();
+                break;
+
                 case "Update Employee Role":
                 updateEmployeeRole();
                 break;
 
                 case "Update Employee Manager":
                 updateEmployeeManager();
+                break;
+
+                case "View Total Utilized Budget By Department":
+                viewTotalBudgetByDepartment();
                 break;
 
                 case "\u001b[31mExit Program\u001b[39m":
@@ -180,6 +200,42 @@ function queryDepartments(){
         //prompt for department selection
         promptDepartments(departments)
     });
+}
+
+// Query the departments without employees
+function queryDepartmentsOnly(){
+    const query = `SELECT id, department.name FROM department;`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        //extract department names to array
+        const  tableData = [];
+        for (let i = 0; i < res.length; i++) {
+            tableData.push({
+                "ID": res[i].id,
+                "Departments": res[i].name
+            });
+        }
+        // Show the departments
+        renderScreen(`All Departments`, tableData);
+    });
+}
+
+// Query the Roles only and display them for viewing
+function queryRolesOnly() {
+    const query = `SELECT id, title FROM employeesdb.role;`;
+    //build table data array from query result
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        const tableData = [];
+        for (let i = 0; i < res.length; i++) {
+            tableData.push({ 
+                "ID": res[i].id,
+                "Roles": res[i].title
+            });
+        }
+        // Show the Roles
+        renderScreen("All Roles", tableData);
+    });   
 }
 
 //query all managers
@@ -403,9 +459,11 @@ function addDepartment() {
         const query = `INSERT INTO department (name) VALUES (?);`;
         connection.query(query, [answer.dName], (err, res) => {
             if (err) throw err;
-            console.log("New Department added successfully!")
+            console.log("  New Department added successfully!")
         });
       });
+       //render screen
+       setTimeout(renderScreen, 500);
 }
 
 function addRole() {
@@ -462,12 +520,12 @@ function addRole() {
             console.log(
             `${answer.rName} was added to the ${answer.roleDept} department.`
             );
-            startApp();
+            setTimeout(renderScreen, 500);
         });
     });
 } 
-
-function removeEmployee(){
+// Remove an employee from the database
+function removeEmployee() {
     const query = `
     SELECT id, concat(employee.first_name, " ", employee.last_name) AS employee_full_name
     FROM employee ;`;
@@ -476,7 +534,7 @@ function removeEmployee(){
         //extract employee names and ids
         let employees = [];
         let employeesNames = [];
-        for (let i=0;i<res.length;i++){
+        for (let i=0; i < res.length; i++) {
             employees.push({
                 id: res[i].id,
                 fullName: res[i].employee_full_name});
@@ -508,6 +566,95 @@ function removeEmployee(){
                 setTimeout(queryEmployeesAll, 500);
             });       
         });
+    });
+}
+
+// Remove a role from the database
+function removeRole() {
+    const query = `
+    SELECT id, role.title FROM role;`
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        //extract department names to array
+        const roles = [];
+        const rolesNames = [];
+        for (let i = 0; i < res.length; i++) {
+            roles.push({
+                id: res[i].id,
+                title: res[i].title});
+            rolesNames.push(res[i].title);   
+        }
+        //prompt for role to remove
+        inquirer
+        .prompt({
+            type: "list",
+            name: "rolesPromptChoice",
+            message: "Select Role:",
+            choices: rolesNames
+          })
+        .then(answer => {
+             //get id of chosen department
+             const chosenRole = answer.rolesPromptChoice;
+             let chosenRoleID;
+             for (let i = 0; i < roles.length; i++) {
+               if (roles[i].title === chosenRole) {
+                 chosenRoleID = roles[i].id;
+                 break;
+               }
+             }
+             const query = "DELETE FROM role WHERE ?";
+             connection.query(query, {id: chosenRoleID}, (err, res) => {
+                if (err) throw err;
+                console.log("Role Removed");
+                //show updated Role table
+                setTimeout(queryRolesOnly, 500);
+            });
+        }); 
+    });
+ }
+
+
+// Remove a department from the database
+function removeDepartment() {
+    const query = `SELECT id, department.name FROM employeesdb.department;`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        //extract department names to array
+        const departments = [];
+        const departmentsNames = [];
+        for (let i = 0; i < res.length; i++) {
+            departments.push({
+                id: res[i].id,
+                name: res[i].name});
+            departmentsNames.push(res[i].name);    
+        }
+        //prompt for department to remove
+        inquirer
+        .prompt({
+            type: "list",
+            name: "departmentsPromptChoice",
+            message: "Select Department to delete:",
+            choices: departmentsNames 
+          })
+        .then(answer => {
+             //get id of chosen department
+             const chosenDepartment = answer.departmentsPromptChoice;
+             let chosenDepartmentID;
+             for (let i = 0; i < departments.length; i++) {
+               if (departments[i].name === chosenDepartment) {
+                 chosenDepartmentID = departments[i].id;
+                 break;
+               }
+             }
+             const query = "DELETE FROM department WHERE ?";
+             connection.query(query, {id: chosenDepartmentID}, (err, res) => {
+                if (err) throw err;
+                console.log("Department Removed");
+                //show updated Department table
+                setTimeout(queryDepartmentsOnly, 500);    
+    
+            });
+        }); 
     });
 }
 
@@ -704,3 +851,10 @@ function updateEmployeeManager(){
         });
     });
 }
+
+/* //  view Total Budget By Department
+function viewTotalBudgetByDepartment() {
+    select name, sum(r.salary) from  employeesdb.department d
+    inner join employeesdb.role r on d.id = r.department_id
+    where d.id like 1;
+} */
