@@ -853,9 +853,20 @@ function updateEmployeeManager(){
     });
 }
 
-/* //  view Total Budget By Department
+//  view Total Budget By Department
 function viewTotalBudgetByDepartment() {
-    select name, sum(r.salary) from  employeesdb.department d
-    inner join employeesdb.role r on d.id = r.department_id
-    where d.id like 1;
-} */
+    const query = `
+    select name, sum(r.salary) AS salary from  employeesdb.department d
+    inner join employeesdb.role r on d.id = r.department_id;`
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        const tableData = [];
+        for (let i = 0; i < res.length; i++) {
+            tableData.push({
+                "Name": res[i].name,
+                "Amount": res[i].salary
+            });
+        }
+        renderScreen("Departments Budget", tableData)
+    })
+}
