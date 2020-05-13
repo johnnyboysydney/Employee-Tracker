@@ -589,7 +589,7 @@ function removeRole() {
         .prompt({
             type: "list",
             name: "rolesPromptChoice",
-            message: "Select Role:",
+            message: "Select Role to delete",
             choices: rolesNames
           })
         .then(answer => {
@@ -616,7 +616,8 @@ function removeRole() {
 
 // Remove a department from the database
 function removeDepartment() {
-    const query = `SELECT id, department.name FROM employeesdb.department;`;
+    const query = `
+    SELECT id, department.name FROM department;`;
     connection.query(query, (err, res) => {
         if (err) throw err;
         //extract department names to array
@@ -633,21 +634,21 @@ function removeDepartment() {
         .prompt({
             type: "list",
             name: "departmentsPromptChoice",
-            message: "Select Department to delete:",
+            message: "Select Department to delete",
             choices: departmentsNames 
           })
         .then(answer => {
              //get id of chosen department
              const chosenDepartment = answer.departmentsPromptChoice;
-             let chosenDepartmentID;
+             let chosenDepartmentId;
              for (let i = 0; i < departments.length; i++) {
                if (departments[i].name === chosenDepartment) {
-                 chosenDepartmentID = departments[i].id;
+                 chosenDepartmentId = departments[i].id;
                  break;
                }
              }
              const query = "DELETE FROM department WHERE ?";
-             connection.query(query, {id: chosenDepartmentID}, (err, res) => {
+             connection.query(query, {id: chosenDepartmentId}, (err, res) => {
                 if (err) throw err;
                 console.log("Department Removed");
                 //show updated Department table
