@@ -107,7 +107,7 @@ function menuPrompt(){
                 removeRole();
                 break;
 
-                case "Remove Deparment":
+                case "Remove Department":
                 removeDepartment();
                 break;
 
@@ -201,6 +201,22 @@ function queryDepartments(){
         promptDepartments(departments)
     });
 }
+
+function queryDepartmentsCallBack(callback){
+    const query = `SELECT department.name FROM department;`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        //extract department names to array
+        const departments = [];
+        for (let i = 0; i < res.length; i++) {
+            departments.push(res[i].name);
+        }
+        //prompt for department selection
+       callback(departments)
+    });
+}
+
+
 
 // Query the departments without employees
 function queryDepartmentsOnly(){
@@ -460,10 +476,12 @@ function addDepartment() {
         connection.query(query, [answer.dName], (err, res) => {
             if (err) throw err;
             console.log("  New Department added successfully!")
+            queryDepartmentsCallBack(function(departments) {
+                renderScreen("departments", departments);
+            } )
         });
-      });
-       //render screen
-       setTimeout(renderScreen, 500);
+        
+    });
 }
 
 function addRole() {
