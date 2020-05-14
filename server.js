@@ -854,9 +854,9 @@ function updateEmployeeManager(){
 }
 
 //  view Total Budget By Department
-function viewTotalBudgetByDepartment(departments) {
+function viewTotalBudgetByDepartment() {
     const query = 
-    `select d.name "Department", SUM(r.salary) "Budget Utilized" 
+    `select d.name "Department", SUM(r.salary) "BudgetUtilized" 
     from role r
     JOIN department d 
     JOIN employee e 
@@ -864,17 +864,13 @@ function viewTotalBudgetByDepartment(departments) {
     connection.query(query, (err, res) => {
         if (err) throw err;
        //build table data array from query result
-       const tableData = [];
-       
+       const tableData = [];      
        for (let i = 0; i < res.length; i++) {
            tableData.push({
-               "Department": res[i].department_name,
-               "Budjet Utilized": res[i].department_salary
+               "Department": res[i].Department,
+               "Budjet Utilized": res[i].BudgetUtilized
            });
-
         }
         renderScreen(`Total Budjet per Department`, tableData);
-        console.log(res)
     });
 }
-
