@@ -39,11 +39,11 @@ To use this application:
 - Clone the GitHub repository at:
 - You will to install all the dependencies, see [Dependencies](#dependencies) for the complete list
 - Using ```npm install```, install all the dependcies
-- Using MySQL or MSSQL database, create the DB using the _schema.sql_ file, you can reciew the database schema on the [Sql schema](#schema.png) file
+- Using MySQL or MSSQL database, create the DB using the _schema.sql_ file, you can reciew the database schema on the [Sql schema](#schema) file
 - Using the _seeds.sql_ file to popluate the DB
 - Once you have all the above created, you can edit the _server.js_ file where the password is and add your password to access your local DataBase.
 - ![Capture](https://user-images.githubusercontent.com/54227198/81936270-531c0600-9635-11ea-8066-dddf1c26dc09.JPG)
-- You can then open a terminal or cmd prompt, navigate to the folder where **_server.js_** is located and type: **_node server.js_**
+- You can then open a terminal or cmd prompt, navigate to the folder where **_server.js_** is located and type: ``node server.js``
 - You will be presented with an ASCII Art log, which you can also edit at your convenience with your selection of art, and the menu,
 - You can navigate the menu using the arrow keys
 - Press enter to select the element highlighted
