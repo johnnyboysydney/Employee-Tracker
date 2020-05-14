@@ -8,6 +8,7 @@ I will architect and build a solution for managing a company's employees using n
 - [Development](#development)
 - [User Story](#user-story)
 - [Installation](#installation)
+- [Schema](#schema)
 - [Dependencies](#dependencies)
 - [Tests](#tests)
 - [Built With](#built-with)
@@ -39,8 +40,19 @@ To use this application:
 - You will to install all the dependencies, see [Dependencies](#dependencies) for the complete list
 - Using ```npm install```, install all the dependcies
 - Using MySQL or MSSQL database, create the DB using the _schema.sql_ file, you can reciew the database schema on the [Sql schema](#schema.png) file
-- Using the _seeds.sql_ file, popluate the DB
+- Using the _seeds.sql_ file to popluate the DB
+- Once you have all the above created, you can edit the _server.js_ file where the password is and add your password to access your local DataBase.
+- ![Capture](https://user-images.githubusercontent.com/54227198/81936270-531c0600-9635-11ea-8066-dddf1c26dc09.JPG)
+- You can then open a terminal or cmd prompt, navigate to the folder where **_server.js_** is located and type: **_node server.js_**
+- You will be presented with an ASCII Art log, which you can also edit at your convenience with your selection of art, and the menu,
+- You can navigate the menu using the arrow keys
+- Press enter to select the element highlighted
+- Follow the prompts for addin employess, roles and departments
+- Select **EXIT** in the menu to end the application
 
+### Schema
+
+<img width="736" alt="schema" src="https://user-images.githubusercontent.com/54227198/81936268-51524280-9635-11ea-9977-82380307b7b2.png">
 
 ### Dependencies
 
@@ -76,6 +88,8 @@ You can go to the **_Delete Employee, Role and Department_** and remove the wron
 
 ## Demo
 
+![Demo](./assets/demo.gif)
+
 ## License
 
 [MIT License](./LICENSE)
@@ -87,6 +101,8 @@ You can go to the **_Delete Employee, Role and Department_** and remove the wron
 ## Acknowledgments
 
 To my 2 sons, who give me the power I need to keep going.
+Special thanks to Vishal who has is a great teacher and during his time with us during the coruse he showed dedication and enourmous passion teaching us
+Stay safe!
 
 ***
 
@@ -95,3 +111,5 @@ To my 2 sons, who give me the power I need to keep going.
 Copyright 2020 &copy; John Merchan
 
 :australia:
+
+[Table of Content](#Table-of-Content) --- [Back to Top](#Employee-Tracker) --- [Installation](#Installation)
