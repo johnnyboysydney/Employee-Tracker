@@ -479,7 +479,7 @@ function addDepartment() {
             queryDepartmentsCallBack(function(departments) {
                 renderScreen("departments", departments);
             } )
-        });
+        })
         
     });
 }
@@ -532,13 +532,14 @@ function addRole() {
         .then((answer) => {
         
             let deptID = departments.find((obj) => obj.name === answer.roleDept).id;
-            connection.query("INSERT INTO role (title, salary, department_id) VALUES (?)", [
-            [answer.rName, answer.salNum, deptID],
-            ]);
-            console.log(
-            `${answer.rName} was added to the ${answer.roleDept} department.`
-            );
-            setTimeout(renderScreen, 500);
+            connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)",
+            [answer.rName, answer.salNum, deptID], (err, res) => {
+                if (err) throw err; 
+                console.log(
+                    `${answer.rName} was added to the ${answer.roleDept} department.`);
+                    queryRolesOnly();
+            });
+           
         });
     });
 } 
