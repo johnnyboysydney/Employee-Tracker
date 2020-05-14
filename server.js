@@ -855,52 +855,26 @@ function updateEmployeeManager(){
 
 //  view Total Budget By Department
 function viewTotalBudgetByDepartment(departments) {
-    const query = `
-    SELECT id, department.name FROM department;`;
+    const query = 
+    `select d.name "Department", SUM(r.salary) "Budget Utilized" 
+    from role r
+    JOIN department d 
+    JOIN employee e 
+    where r.id = e.role_id and r.id = d.id group by r.id;`
     connection.query(query, (err, res) => {
         if (err) throw err;
-        //extract department names to array
-        const departments = [];
-        const departmentsNames = [];
-        for (let i = 0; i < res.length; i++) {
-            departments.push({
-                id: res[i].id,
-                name: res[i].name});
-            departmentsNames.push(res[i].name);    
+       //build table data array from query result
+       const tableData = [];
+       
+       for (let i = 0; i < res.length; i++) {
+           tableData.push({
+               "Department": res[i].department_name,
+               "Budjet Utilized": res[i].department_salary
+           });
+
         }
-        //prompt for department to remove
-        inquirer
-        .prompt({
-            type: "list",
-            name: "departmentsPromptChoice",
-            message: "Select Department to delete",
-            choices: departmentsNames 
-          })
-        .then(answer => {
-            //get id of chosen department
-             const chosenDepartment = answer.departmentsPromptChoice;
-             let chosenDepartmentId;
-             for (let i = 0; i < departments.length; i++) {
-               if (departments[i].name === chosenDepartment) {
-                 chosenDepartmentId = departments[i].id;
-                 break;
-               }
-             }
-             const query = `
-            select d.name, sum(r.salary) AS salary from  employeesdb.department d
-            inner join employeesdb.role r on d.id = r.department_id WHERE?;`;
-            connection.query(query, {id: chosenDepartmentId}, (err, res) => {
-                if (err) throw err;
-                    const tableData = [];
-                    for (let i = 0; i < res.length; i++) {
-                        tableData.push({
-                        "Name": res[i].name,
-                        "Amount": res[i].salary
-                        });
-                    }        
-            });    
-            renderScreen(`Department Budget`, tableData)
-        });
+        renderScreen(`Total Budjet per Department`, tableData);
+        console.log(res)
     });
 }
 
